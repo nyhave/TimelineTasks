@@ -6,609 +6,894 @@
   <title>TimelineTasks — Plan Life's Big Moments</title>
   <meta name="description" content="Template-driven life event planning with auto-calculated deadlines, collaboration, and smart reminders." />
   <style>
-    /* ── Reset & Base ────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #f5f6fa;
-      --card: #ffffff;
-      --primary: #4f46e5;
-      --primary-light: #eef2ff;
-      --accent: #f59e0b;
-      --green: #10b981;
-      --red: #ef4444;
-      --gray-50: #f9fafb;
-      --gray-100: #f3f4f6;
-      --gray-200: #e5e7eb;
-      --gray-300: #d1d5db;
-      --gray-400: #9ca3af;
-      --gray-500: #6b7280;
-      --gray-600: #4b5563;
-      --gray-700: #374151;
-      --gray-800: #1f2937;
-      --gray-900: #111827;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
-      --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
-      --shadow-md: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -2px rgba(0,0,0,.1);
-      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
-      --radius: 12px;
-      --radius-sm: 8px;
+    /* ── Reset ─────────────────────────────────────── */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#f5f6fa;--card:#fff;--primary:#4f46e5;--primary-light:#eef2ff;
+      --accent:#f59e0b;--green:#10b981;--red:#ef4444;--pink:#ec4899;--blue:#3b82f6;
+      --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;--g400:#9ca3af;
+      --g500:#6b7280;--g600:#4b5563;--g700:#374151;--g800:#1f2937;--g900:#111827;
+      --shadow:0 1px 3px rgba(0,0,0,.1);--shadow-md:0 4px 6px -1px rgba(0,0,0,.1);
+      --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1);--r:12px;--rs:8px;
     }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: var(--bg);
-      color: var(--gray-800);
-      line-height: 1.5;
-      min-height: 100vh;
-    }
+    html{height:100%}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--g800);line-height:1.5;min-height:100%;display:flex;flex-direction:column;align-items:center}
+    button{font:inherit;cursor:pointer;border:none;background:none}
+    input,select,textarea{font:inherit}
+    a{color:var(--primary);text-decoration:none}
 
-    /* ── Mobile Frame ────────────────────────────────── */
-    .phone-frame {
-      max-width: 420px;
-      margin: 32px auto;
-      background: var(--card);
-      border-radius: 40px;
-      box-shadow: var(--shadow-lg), 0 0 0 8px var(--gray-800), 0 0 0 10px var(--gray-600);
-      overflow: hidden;
-      position: relative;
-    }
-    .status-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 24px 4px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--gray-800);
-    }
-    .status-bar-icons { display: flex; gap: 6px; align-items: center; }
-    .status-bar-icons svg { width: 16px; height: 16px; }
+    /* ── App Shell ─────────────────────────────────── */
+    .app{width:100%;max-width:480px;min-height:100vh;background:var(--card);position:relative;overflow-x:hidden;padding-bottom:72px}
+    .screen{display:none;animation:fadeIn .25s ease}
+    .screen.active{display:block}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-    /* ── Notch ────────────────────────────────────────── */
-    .notch {
-      width: 150px;
-      height: 28px;
-      background: var(--gray-800);
-      border-radius: 0 0 20px 20px;
-      margin: 0 auto;
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-    }
+    /* ── Status Bar ────────────────────────────────── */
+    .status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 2px;font-size:13px;font-weight:600;color:var(--g800)}
 
-    /* ── Header ──────────────────────────────────────── */
-    .header {
-      padding: 16px 20px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .header-left h1 {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--gray-900);
-    }
-    .header-left p {
-      font-size: 14px;
-      color: var(--gray-500);
-      margin-top: 2px;
-    }
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), #7c3aed);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      font-size: 16px;
-    }
+    /* ── Nav Bar (header) ──────────────────────────── */
+    .nav-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px}
+    .nav-header h1{font-size:22px;font-weight:700}
+    .nav-header .subtitle{font-size:13px;color:var(--g500);margin-top:1px}
+    .avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;cursor:pointer}
+    .back-btn{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:var(--primary);cursor:pointer;padding:4px 0}
+    .back-btn svg{width:18px;height:18px}
 
-    /* ── Overview Cards ──────────────────────────────── */
-    .overview-row {
-      display: flex;
-      gap: 10px;
-      padding: 0 20px 16px;
-    }
-    .overview-card {
-      flex: 1;
-      background: var(--gray-50);
-      border-radius: var(--radius-sm);
-      padding: 14px;
-      text-align: center;
-    }
-    .overview-card .num {
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--gray-900);
-    }
-    .overview-card .label {
-      font-size: 12px;
-      color: var(--gray-500);
-      margin-top: 2px;
-    }
-    .overview-card.highlight {
-      background: var(--primary-light);
-    }
-    .overview-card.highlight .num { color: var(--primary); }
+    /* ── Bottom Tab Bar ────────────────────────────── */
+    .tab-bar{position:fixed;bottom:0;width:100%;max-width:480px;display:flex;justify-content:space-around;align-items:center;padding:8px 0 20px;background:var(--card);border-top:1px solid var(--g200);z-index:100}
+    .tab-item{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--g400);cursor:pointer;transition:.15s;position:relative;padding:4px 12px}
+    .tab-item.active{color:var(--primary)}
+    .tab-item svg{width:22px;height:22px}
+    .tab-item span{font-size:11px;font-weight:600}
+    .tab-badge{position:absolute;top:0;right:4px;width:16px;height:16px;background:var(--red);color:#fff;border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
 
-    /* ── Section Header ──────────────────────────────── */
-    .section-header {
-      padding: 4px 20px 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .section-header h2 {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--gray-800);
-    }
-    .section-header a {
-      font-size: 13px;
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 600;
-    }
+    /* ── Overview Cards ────────────────────────────── */
+    .overview-row{display:flex;gap:10px;padding:0 20px 14px}
+    .overview-card{flex:1;background:var(--g50);border-radius:var(--rs);padding:12px;text-align:center}
+    .overview-card .num{font-size:24px;font-weight:700;color:var(--g900)}
+    .overview-card .lbl{font-size:11px;color:var(--g500);margin-top:1px}
+    .overview-card.hl{background:var(--primary-light)}
+    .overview-card.hl .num{color:var(--primary)}
 
-    /* ── Project Cards ───────────────────────────────── */
-    .project-list {
-      padding: 0 20px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .project-card {
-      background: var(--card);
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 16px;
-      transition: box-shadow .15s;
-      cursor: pointer;
-    }
-    .project-card:hover { box-shadow: var(--shadow-md); }
-    .project-top {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-    .project-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-    .project-icon.wedding { background: #fce7f3; }
-    .project-icon.moving  { background: #dbeafe; }
-    .project-icon.marathon { background: #d1fae5; }
-    .project-info { flex: 1; min-width: 0; }
-    .project-info h3 {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--gray-900);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .project-meta {
-      font-size: 12px;
-      color: var(--gray-500);
-      margin-top: 2px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .project-meta .dot { color: var(--gray-300); }
-    .progress-bar-wrapper {
-      background: var(--gray-100);
-      height: 6px;
-      border-radius: 3px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-    .progress-bar {
-      height: 100%;
-      border-radius: 3px;
-      transition: width .4s ease;
-    }
-    .progress-bar.wedding-bar { background: linear-gradient(90deg, #ec4899, #f472b6); }
-    .progress-bar.moving-bar  { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-    .progress-bar.marathon-bar { background: linear-gradient(90deg, #10b981, #34d399); }
-    .progress-text {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 6px;
-      font-size: 12px;
-      color: var(--gray-500);
-    }
-    .progress-pct { font-weight: 700; }
-    .progress-pct.wedding-c { color: #ec4899; }
-    .progress-pct.moving-c  { color: #3b82f6; }
-    .progress-pct.marathon-c { color: #10b981; }
+    /* ── Section Header ───────────────────────────── */
+    .sec-hdr{padding:4px 20px 8px;display:flex;justify-content:space-between;align-items:center}
+    .sec-hdr h2{font-size:15px;font-weight:700}
+    .sec-hdr a{font-size:12px;font-weight:600}
 
-    /* Due badge */
-    .due-badge {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-weight: 600;
-      flex-shrink: 0;
-    }
-    .due-badge.soon {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .due-badge.ok {
-      background: #d1fae5;
-      color: #065f46;
-    }
+    /* ── Project Cards ────────────────────────────── */
+    .project-list{padding:0 20px 12px;display:flex;flex-direction:column;gap:10px}
+    .project-card{background:var(--card);border:1px solid var(--g200);border-radius:var(--r);padding:14px;cursor:pointer;transition:.15s}
+    .project-card:hover{box-shadow:var(--shadow-md)}
+    .proj-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .proj-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+    .proj-icon.wedding{background:#fce7f3}.proj-icon.moving{background:#dbeafe}.proj-icon.marathon{background:#d1fae5}.proj-icon.baby{background:#fef3c7}.proj-icon.job{background:#ede9fe}
+    .proj-info{flex:1;min-width:0}
+    .proj-info h3{font-size:14px;font-weight:700;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .proj-meta{font-size:11px;color:var(--g500);margin-top:1px;display:flex;gap:6px;align-items:center}
+    .due-badge{font-size:10px;padding:2px 7px;border-radius:999px;font-weight:600;flex-shrink:0}
+    .due-badge.soon{background:#fef3c7;color:#92400e}
+    .due-badge.ok{background:#d1fae5;color:#065f46}
+    .due-badge.urgent{background:#fee2e2;color:#991b1b}
+    .progress-wrap{background:var(--g100);height:5px;border-radius:3px;overflow:hidden;margin-top:8px}
+    .progress-bar{height:100%;border-radius:3px;transition:width .4s}
+    .progress-text{display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--g500)}
+    .progress-pct{font-weight:700}
 
-    /* ── Upcoming Tasks ──────────────────────────────── */
-    .task-list {
-      padding: 0 20px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .task-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
-      background: var(--gray-50);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-    }
-    .task-item:hover { background: var(--gray-100); }
-    .task-checkbox {
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--gray-300);
-      border-radius: 6px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .15s;
-    }
-    .task-checkbox.checked {
-      background: var(--green);
-      border-color: var(--green);
-    }
-    .task-checkbox.checked svg { display: block; }
-    .task-checkbox svg { display: none; }
-    .task-content { flex: 1; min-width: 0; }
-    .task-content .task-name {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--gray-800);
-    }
-    .task-content .task-name.done {
-      text-decoration: line-through;
-      color: var(--gray-400);
-    }
-    .task-content .task-project {
-      font-size: 12px;
-      color: var(--gray-400);
-      margin-top: 1px;
-    }
-    .task-due {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 999px;
-      flex-shrink: 0;
-    }
-    .task-due.urgent {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-    .task-due.warning {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .task-due.normal {
-      background: var(--gray-100);
-      color: var(--gray-600);
-    }
+    /* ── Task Items ────────────────────────────────── */
+    .task-list{padding:0 20px 16px;display:flex;flex-direction:column;gap:6px}
+    .task-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--g50);border-radius:var(--rs);cursor:pointer;transition:.1s}
+    .task-item:hover{background:var(--g100)}
+    .task-cb{width:20px;height:20px;border:2px solid var(--g300);border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s}
+    .task-cb.done{background:var(--green);border-color:var(--green)}
+    .task-cb svg{display:none;width:12px;height:12px;color:#fff}
+    .task-cb.done svg{display:block}
+    .task-body{flex:1;min-width:0}
+    .task-name{font-size:13px;font-weight:500;color:var(--g800)}
+    .task-name.struck{text-decoration:line-through;color:var(--g400)}
+    .task-sub{font-size:11px;color:var(--g400);margin-top:1px}
+    .task-due{font-size:10px;font-weight:600;padding:2px 7px;border-radius:999px;flex-shrink:0}
+    .task-due.urgent{background:#fee2e2;color:#991b1b}
+    .task-due.warning{background:#fef3c7;color:#92400e}
+    .task-due.normal{background:var(--g100);color:var(--g600)}
+    .task-due.done-lbl{background:#d1fae5;color:#065f46}
 
-    /* ── FAB ──────────────────────────────────────────── */
-    .fab {
-      position: absolute;
-      bottom: 80px;
-      right: 20px;
-      width: 52px;
-      height: 52px;
-      background: linear-gradient(135deg, var(--primary), #7c3aed);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: var(--shadow-lg);
-      cursor: pointer;
-      transition: transform .15s;
-    }
-    .fab:hover { transform: scale(1.08); }
-    .fab svg { width: 26px; height: 26px; color: white; }
+    /* ── FAB ───────────────────────────────────────── */
+    .fab{position:fixed;bottom:84px;right:calc(50% - 210px);width:50px;height:50px;background:linear-gradient(135deg,var(--primary),#7c3aed);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-lg);cursor:pointer;transition:.15s;z-index:90}
+    .fab:hover{transform:scale(1.08)}
+    .fab svg{width:24px;height:24px;color:#fff}
+    @media(max-width:480px){.fab{right:20px}}
 
-    /* ── Bottom Nav ───────────────────────────────────── */
-    .bottom-nav {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 10px 0 28px;
-      border-top: 1px solid var(--gray-200);
-      background: var(--card);
-    }
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      cursor: pointer;
-      color: var(--gray-400);
-      transition: color .15s;
-      position: relative;
-    }
-    .nav-item.active { color: var(--primary); }
-    .nav-item svg { width: 22px; height: 22px; }
-    .nav-item span {
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .nav-badge {
-      position: absolute;
-      top: -4px;
-      right: -8px;
-      width: 16px;
-      height: 16px;
-      background: var(--red);
-      color: white;
-      border-radius: 50%;
-      font-size: 10px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    /* ── Template Browse ──────────────────────────── */
+    .tpl-grid{padding:0 20px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .tpl-card{background:var(--card);border:1px solid var(--g200);border-radius:var(--r);padding:14px;cursor:pointer;transition:.15s;text-align:center}
+    .tpl-card:hover{box-shadow:var(--shadow-md);border-color:var(--primary)}
+    .tpl-card .icon{font-size:32px;margin-bottom:6px}
+    .tpl-card h3{font-size:13px;font-weight:700;color:var(--g900)}
+    .tpl-card p{font-size:11px;color:var(--g500);margin-top:2px}
+    .tpl-card .task-count{font-size:10px;font-weight:600;color:var(--primary);margin-top:6px}
 
-    /* ── Page Title (outside phone) ──────────────────── */
-    .page-title {
-      text-align: center;
-      padding: 40px 20px 0;
-    }
-    .page-title h1 {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--gray-900);
-    }
-    .page-title p {
-      color: var(--gray-500);
-      font-size: 15px;
-      margin-top: 6px;
-    }
-    .page-title .badge {
-      display: inline-block;
-      margin-top: 12px;
-      background: var(--primary-light);
-      color: var(--primary);
-      font-size: 13px;
-      font-weight: 600;
-      padding: 4px 14px;
-      border-radius: 999px;
-    }
-    .footer-note {
-      text-align: center;
-      padding: 24px 20px 48px;
-      font-size: 13px;
-      color: var(--gray-400);
-    }
+    /* ── Onboarding ────────────────────────────────── */
+    .onboard{display:none;min-height:100vh;flex-direction:column;padding:0 24px 32px}
+    .onboard.active{display:flex}
+    .onboard-content{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+    .onboard-content .big-icon{font-size:64px;margin-bottom:20px}
+    .onboard-content h1{font-size:26px;font-weight:800;color:var(--g900);margin-bottom:8px}
+    .onboard-content p{font-size:15px;color:var(--g500);max-width:320px;line-height:1.6}
+    .onboard-dots{display:flex;gap:6px;justify-content:center;margin:20px 0}
+    .onboard-dots .dot{width:8px;height:8px;border-radius:50%;background:var(--g300);transition:.2s}
+    .onboard-dots .dot.active{background:var(--primary);width:24px;border-radius:4px}
+    .btn-primary{width:100%;padding:14px;border-radius:var(--r);background:var(--primary);color:#fff;font-size:15px;font-weight:700;transition:.15s}
+    .btn-primary:hover{background:#4338ca}
+    .btn-secondary{width:100%;padding:14px;border-radius:var(--r);background:var(--g100);color:var(--g700);font-size:15px;font-weight:600;transition:.15s;margin-top:8px}
+    .btn-secondary:hover{background:var(--g200)}
+    .skip-btn{color:var(--g400);font-size:13px;font-weight:600;margin-top:12px;cursor:pointer}
+
+    /* ── Create Project Modal ──────────────────────── */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;justify-content:center;align-items:flex-end}
+    .modal-overlay.open{display:flex}
+    .modal-sheet{width:100%;max-width:480px;background:var(--card);border-radius:20px 20px 0 0;padding:24px 20px 32px;max-height:85vh;overflow-y:auto;animation:slideUp .3s ease}
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+    .modal-handle{width:40px;height:4px;background:var(--g300);border-radius:2px;margin:0 auto 16px}
+    .modal-sheet h2{font-size:18px;font-weight:700;margin-bottom:16px}
+    .form-group{margin-bottom:14px}
+    .form-group label{display:block;font-size:13px;font-weight:600;color:var(--g700);margin-bottom:4px}
+    .form-group input,.form-group select{width:100%;padding:10px 12px;border:1px solid var(--g200);border-radius:var(--rs);font-size:14px;transition:.15s}
+    .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+    .tpl-select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+    .tpl-opt{padding:10px 6px;border:2px solid var(--g200);border-radius:var(--rs);text-align:center;cursor:pointer;transition:.15s}
+    .tpl-opt:hover{border-color:var(--g300)}
+    .tpl-opt.selected{border-color:var(--primary);background:var(--primary-light)}
+    .tpl-opt .icon{font-size:24px}
+    .tpl-opt .name{font-size:11px;font-weight:600;margin-top:4px;color:var(--g700)}
+
+    /* ── Project Detail ────────────────────────────── */
+    .detail-hero{padding:0 20px 16px}
+    .detail-hero .proj-top{margin-bottom:12px}
+    .detail-hero h2{font-size:20px;font-weight:700;color:var(--g900)}
+    .detail-hero .meta-row{display:flex;gap:12px;font-size:12px;color:var(--g500);margin-top:4px}
+    .detail-stats{display:flex;gap:10px;margin-top:12px}
+    .detail-stat{flex:1;background:var(--g50);border-radius:var(--rs);padding:10px;text-align:center}
+    .detail-stat .num{font-size:20px;font-weight:700;color:var(--g900)}
+    .detail-stat .lbl{font-size:10px;color:var(--g500);margin-top:1px}
+    .category-tabs{display:flex;gap:6px;padding:0 20px 12px;overflow-x:auto}
+    .cat-tab{padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;background:var(--g100);color:var(--g600);cursor:pointer;white-space:nowrap;transition:.15s}
+    .cat-tab.active{background:var(--primary);color:#fff}
+    .task-section-label{padding:4px 20px 6px;font-size:12px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.5px}
+
+    /* ── Celebration ───────────────────────────────── */
+    .celebration{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:300;pointer-events:none}
+    .celebration.show{display:flex}
+    .celebration .emoji{font-size:72px;animation:pop .6s ease}
+    @keyframes pop{0%{transform:scale(0);opacity:0}50%{transform:scale(1.3)}100%{transform:scale(1);opacity:1}}
+
+    /* ── Profile Screen ───────────────────────────── */
+    .profile-header{text-align:center;padding:20px 20px 16px}
+    .profile-header .big-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;font-weight:700;margin:0 auto 10px}
+    .profile-header h2{font-size:18px;font-weight:700}
+    .profile-header p{font-size:13px;color:var(--g500)}
+    .settings-list{padding:0 20px}
+    .settings-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--g100);cursor:pointer}
+    .settings-item svg{width:20px;height:20px;color:var(--g500)}
+    .settings-item .si-text{flex:1}
+    .settings-item .si-text h4{font-size:14px;font-weight:600;color:var(--g800)}
+    .settings-item .si-text p{font-size:12px;color:var(--g500)}
+    .settings-item .arrow{color:var(--g400);font-size:16px}
+
+    /* ── Tip Callout ──────────────────────────────── */
+    .tip-callout{margin:0 20px 12px;padding:12px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:var(--rs);display:flex;gap:8px;align-items:flex-start}
+    .tip-callout .tip-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+    .tip-callout p{font-size:12px;color:#92400e;line-height:1.5}
+
+    /* ── Empty State ──────────────────────────────── */
+    .empty-state{text-align:center;padding:40px 20px}
+    .empty-state .big-icon{font-size:48px;margin-bottom:12px}
+    .empty-state h3{font-size:16px;font-weight:700;color:var(--g800);margin-bottom:4px}
+    .empty-state p{font-size:13px;color:var(--g500);margin-bottom:16px}
+
+    /* ── Confetti ──────────────────────────────────── */
+    .confetti-piece{position:fixed;width:8px;height:8px;border-radius:2px;z-index:400;pointer-events:none}
   </style>
 </head>
 <body>
 
-<!-- ── Page Title ─────────────────────────────────── -->
-<div class="page-title">
-  <h1>TimelineTasks</h1>
-  <p>Plan life's big moments with smart, deadline-driven checklists.</p>
-  <span class="badge">Screen Mockup — Home Dashboard</span>
-</div>
+<!-- ════════════════════════════════════════════════ -->
+<!--  ONBOARDING                                     -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="app" id="app">
 
-<!-- ── Phone Frame ────────────────────────────────── -->
-<div class="phone-frame">
-  <div class="notch"></div>
-
-  <!-- Status Bar -->
-  <div class="status-bar">
-    <span>9:41</span>
-    <div class="status-bar-icons">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1h4v22H1z"/><path d="M7 7h4v16H7z"/><path d="M13 4h4v19h-4z"/><path d="M19 1h4v22h-4z"/></svg>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
-      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="4" y="9" width="10" height="8" rx="1" fill="currentColor" opacity=".6"/><rect x="21" y="10" width="2" height="6" rx="1" fill="currentColor"/></svg>
+  <!-- Onboarding Step 1: Welcome -->
+  <div class="onboard active" id="onboard-1">
+    <div class="status-bar"><span>9:41</span><span></span></div>
+    <div class="onboard-content">
+      <div class="big-icon">&#x1F3AF;</div>
+      <h1>TimelineTasks</h1>
+      <p>Plan life's big moments with smart, deadline-driven checklists. Never miss a step again.</p>
     </div>
+    <div class="onboard-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <button class="btn-primary" onclick="goOnboard(2)">Get Started</button>
+    <div class="skip-btn" onclick="finishOnboard()">Skip intro</div>
   </div>
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-left">
-      <h1>My Projects</h1>
-      <p>Welcome back, Sarah</p>
+  <!-- Onboarding Step 2: Pick a template -->
+  <div class="onboard" id="onboard-2">
+    <div class="status-bar"><span>9:41</span><span></span></div>
+    <div class="onboard-content">
+      <div class="big-icon">&#x1F4CB;</div>
+      <h1>Choose a Template</h1>
+      <p>Start with an expert-crafted template for your life event. Every task and deadline auto-calculated.</p>
     </div>
-    <div class="avatar">S</div>
+    <div class="onboard-dots"><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <button class="btn-primary" onclick="goOnboard(3)">Next</button>
+    <div class="back-btn" onclick="goOnboard(1)" style="text-align:center;margin-top:8px;justify-content:center">Back</div>
   </div>
 
-  <!-- Overview -->
-  <div class="overview-row">
-    <div class="overview-card highlight">
-      <div class="num">3</div>
-      <div class="label">Active</div>
+  <!-- Onboarding Step 3: Set your date -->
+  <div class="onboard" id="onboard-3">
+    <div class="status-bar"><span>9:41</span><span></span></div>
+    <div class="onboard-content">
+      <div class="big-icon">&#x1F4C5;</div>
+      <h1>Set Your Date</h1>
+      <p>Pick a target date and we'll work backwards to calculate every deadline automatically.</p>
     </div>
-    <div class="overview-card">
-      <div class="num">42</div>
-      <div class="label">Tasks left</div>
-    </div>
-    <div class="overview-card">
-      <div class="num">68%</div>
-      <div class="label">Overall</div>
-    </div>
+    <div class="onboard-dots"><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+    <button class="btn-primary" onclick="goOnboard(4)">Next</button>
+    <div class="back-btn" onclick="goOnboard(2)" style="text-align:center;margin-top:8px;justify-content:center">Back</div>
   </div>
 
-  <!-- Projects -->
-  <div class="section-header">
-    <h2>Active Projects</h2>
-    <a href="#">See all</a>
-  </div>
-  <div class="project-list">
-    <!-- Wedding -->
-    <div class="project-card">
-      <div class="project-top">
-        <div class="project-icon wedding">💒</div>
-        <div class="project-info">
-          <h3>Our Wedding</h3>
-          <div class="project-meta">
-            <span>Jun 15, 2026</span>
-            <span class="dot">&middot;</span>
-            <span>18 of 24 tasks</span>
-          </div>
-        </div>
-        <span class="due-badge soon">121 days</span>
-      </div>
-      <div class="progress-bar-wrapper">
-        <div class="progress-bar wedding-bar" style="width:75%"></div>
-      </div>
-      <div class="progress-text">
-        <span>18 / 24 completed</span>
-        <span class="progress-pct wedding-c">75%</span>
-      </div>
+  <!-- Onboarding Step 4: Track progress -->
+  <div class="onboard" id="onboard-4">
+    <div class="status-bar"><span>9:41</span><span></span></div>
+    <div class="onboard-content">
+      <div class="big-icon">&#x2705;</div>
+      <h1>Track Progress</h1>
+      <p>Check off tasks as you go. See your progress, get reminders, and celebrate milestones.</p>
     </div>
-
-    <!-- Moving -->
-    <div class="project-card">
-      <div class="project-top">
-        <div class="project-icon moving">📦</div>
-        <div class="project-info">
-          <h3>Moving to New Apartment</h3>
-          <div class="project-meta">
-            <span>Mar 20, 2026</span>
-            <span class="dot">&middot;</span>
-            <span>10 of 18 tasks</span>
-          </div>
-        </div>
-        <span class="due-badge soon">34 days</span>
-      </div>
-      <div class="progress-bar-wrapper">
-        <div class="progress-bar moving-bar" style="width:56%"></div>
-      </div>
-      <div class="progress-text">
-        <span>10 / 18 completed</span>
-        <span class="progress-pct moving-c">56%</span>
-      </div>
-    </div>
-
-    <!-- Marathon -->
-    <div class="project-card">
-      <div class="project-top">
-        <div class="project-icon marathon">🏃</div>
-        <div class="project-info">
-          <h3>First Marathon</h3>
-          <div class="project-meta">
-            <span>Sep 12, 2026</span>
-            <span class="dot">&middot;</span>
-            <span>5 of 16 tasks</span>
-          </div>
-        </div>
-        <span class="due-badge ok">210 days</span>
-      </div>
-      <div class="progress-bar-wrapper">
-        <div class="progress-bar marathon-bar" style="width:31%"></div>
-      </div>
-      <div class="progress-text">
-        <span>5 / 16 completed</span>
-        <span class="progress-pct marathon-c">31%</span>
-      </div>
-    </div>
+    <div class="onboard-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div></div>
+    <button class="btn-primary" onclick="goOnboard(5)">Next</button>
+    <div class="back-btn" onclick="goOnboard(3)" style="text-align:center;margin-top:8px;justify-content:center">Back</div>
   </div>
 
-  <!-- Upcoming Tasks -->
-  <div class="section-header">
-    <h2>Upcoming Tasks</h2>
-    <a href="#">View all</a>
+  <!-- Onboarding Step 5: Collaborate -->
+  <div class="onboard" id="onboard-5">
+    <div class="status-bar"><span>9:41</span><span></span></div>
+    <div class="onboard-content">
+      <div class="big-icon">&#x1F91D;</div>
+      <h1>Collaborate</h1>
+      <p>Invite partners, family, or friends to plan together. Assign tasks and share progress.</p>
+    </div>
+    <div class="onboard-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div></div>
+    <button class="btn-primary" onclick="finishOnboard()">Start Planning</button>
+    <div class="back-btn" onclick="goOnboard(4)" style="text-align:center;margin-top:8px;justify-content:center">Back</div>
   </div>
-  <div class="task-list">
-    <div class="task-item">
-      <div class="task-checkbox"></div>
-      <div class="task-content">
-        <div class="task-name">Confirm catering menu</div>
-        <div class="task-project">Our Wedding</div>
-      </div>
-      <span class="task-due urgent">Tomorrow</span>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!--  HOME SCREEN                                 -->
+  <!-- ════════════════════════════════════════════ -->
+  <div class="screen" id="screen-home">
+    <div class="status-bar"><span>9:41</span><span></span></div>
+    <div class="nav-header">
+      <div><h1>My Projects</h1><div class="subtitle" id="home-greeting">Welcome back, Sarah</div></div>
+      <div class="avatar" onclick="navigate('profile')">S</div>
     </div>
-    <div class="task-item">
-      <div class="task-checkbox"></div>
-      <div class="task-content">
-        <div class="task-name">Schedule moving truck</div>
-        <div class="task-project">Moving to New Apartment</div>
-      </div>
-      <span class="task-due warning">3 days</span>
+
+    <div class="overview-row" id="home-overview"></div>
+
+    <div class="sec-hdr"><h2>Active Projects</h2></div>
+    <div class="project-list" id="home-projects"></div>
+
+    <div class="sec-hdr" style="margin-top:8px"><h2>Upcoming Tasks</h2></div>
+    <div class="task-list" id="home-tasks"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!--  BROWSE TEMPLATES                            -->
+  <!-- ════════════════════════════════════════════ -->
+  <div class="screen" id="screen-browse">
+    <div class="status-bar"><span>9:41</span><span></span></div>
+    <div class="nav-header"><div><h1>Templates</h1><div class="subtitle">Expert-crafted plans for every event</div></div></div>
+
+    <div class="tip-callout">
+      <span class="tip-icon">&#x1F4A1;</span>
+      <p>Pick a template to start a new project. All deadlines are auto-calculated from your target date.</p>
     </div>
-    <div class="task-item">
-      <div class="task-checkbox checked">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+
+    <div class="tpl-grid" id="tpl-grid"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!--  PROJECT DETAIL                              -->
+  <!-- ════════════════════════════════════════════ -->
+  <div class="screen" id="screen-detail">
+    <div class="status-bar"><span>9:41</span><span></span></div>
+    <div class="nav-header">
+      <div class="back-btn" onclick="navigate('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
       </div>
-      <div class="task-content">
-        <div class="task-name done">Book photographer</div>
-        <div class="task-project">Our Wedding</div>
-      </div>
-      <span class="task-due normal">Done</span>
     </div>
-    <div class="task-item">
-      <div class="task-checkbox"></div>
-      <div class="task-content">
-        <div class="task-name">Start 10K training plan</div>
-        <div class="task-project">First Marathon</div>
+    <div class="detail-hero" id="detail-hero"></div>
+    <div class="category-tabs" id="detail-cats"></div>
+    <div id="detail-task-sections"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!--  PROFILE                                     -->
+  <!-- ════════════════════════════════════════════ -->
+  <div class="screen" id="screen-profile">
+    <div class="status-bar"><span>9:41</span><span></span></div>
+    <div class="nav-header"><div><h1>Profile</h1></div></div>
+    <div class="profile-header">
+      <div class="big-avatar">S</div>
+      <h2>Sarah Jensen</h2>
+      <p>sarah.jensen@email.com</p>
+    </div>
+    <div class="overview-row" id="profile-stats"></div>
+    <div class="settings-list">
+      <div class="settings-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="si-text"><h4>Notifications</h4><p>Manage deadline reminders</p></div>
+        <span class="arrow">&#x203A;</span>
       </div>
-      <span class="task-due normal">5 days</span>
+      <div class="settings-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <div class="si-text"><h4>Collaborators</h4><p>Manage shared access</p></div>
+        <span class="arrow">&#x203A;</span>
+      </div>
+      <div class="settings-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <div class="si-text"><h4>Settings</h4><p>Account, appearance, data</p></div>
+        <span class="arrow">&#x203A;</span>
+      </div>
+      <div class="settings-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        <div class="si-text"><h4>Subscription</h4><p>Free plan &mdash; Upgrade to Premium</p></div>
+        <span class="arrow">&#x203A;</span>
+      </div>
     </div>
   </div>
 
   <!-- FAB -->
-  <div class="fab">
+  <div class="fab" id="fab" onclick="openCreateModal()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   </div>
 
-  <!-- Bottom Nav -->
-  <div class="bottom-nav">
-    <div class="nav-item active">
+  <!-- Bottom Tab Bar -->
+  <div class="tab-bar">
+    <div class="tab-item active" data-tab="home" onclick="navigate('home')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span>Home</span>
     </div>
-    <div class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <span>Calendar</span>
+    <div class="tab-item" data-tab="browse" onclick="navigate('browse')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Browse</span>
     </div>
-    <div class="nav-item" style="position:relative;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-      <span>Inbox</span>
-      <div class="nav-badge">2</div>
-    </div>
-    <div class="nav-item">
+    <div class="tab-item" data-tab="profile" onclick="navigate('profile')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span>Profile</span>
     </div>
   </div>
 </div>
 
-<p class="footer-note">
-  TimelineTasks &mdash; Template-driven life event planning.<br/>
-  Auto-calculated deadlines &middot; Collaboration &middot; Smart reminders
-</p>
+<!-- ════════════════════════════════════════════════ -->
+<!--  CREATE PROJECT MODAL                           -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="create-modal" onclick="closeCreateModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h2>New Project</h2>
+
+    <div class="form-group">
+      <label>Choose Template</label>
+      <div class="tpl-select-grid" id="modal-tpl-grid"></div>
+    </div>
+
+    <div class="form-group">
+      <label>Project Name</label>
+      <input type="text" id="proj-name" placeholder="e.g. Our Wedding" />
+    </div>
+
+    <div class="form-group">
+      <label>Target Date</label>
+      <input type="date" id="proj-date" />
+    </div>
+
+    <button class="btn-primary" onclick="createProject()" style="margin-top:8px">Create Project</button>
+    <button class="btn-secondary" onclick="closeCreateModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- Celebration -->
+<div class="celebration" id="celebration"><div class="emoji">&#x1F389;</div></div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!--  JAVASCRIPT                                     -->
+<!-- ════════════════════════════════════════════════ -->
+<script>
+/* ── Template Data ─────────────────────────────── */
+const TEMPLATES = [
+  { id:'wedding', icon:'&#x1F492;', name:'Wedding', cls:'wedding', desc:'12-month plan', categories:['Venue & Vendors','Guest Management','Attire & Beauty','Legal & Admin','Day-of Logistics'],
+    tasks:[
+      {name:'Set budget and priorities',cat:'Legal & Admin',days:365,tip:'Decide how much you can spend and what matters most.'},
+      {name:'Create guest list',cat:'Guest Management',days:350,tip:'Start with a rough list. You can refine later.'},
+      {name:'Research & visit venues',cat:'Venue & Vendors',days:340,tip:'Book popular venues early — they fill up fast!'},
+      {name:'Book venue',cat:'Venue & Vendors',days:300,tip:'Confirm the date and put down a deposit.'},
+      {name:'Hire photographer',cat:'Venue & Vendors',days:280,tip:'Look at portfolios and book a consultation.'},
+      {name:'Select wedding party',cat:'Guest Management',days:270,tip:'Ask your closest friends and family.'},
+      {name:'Send save-the-dates',cat:'Guest Management',days:240,tip:'Give guests time to plan, especially for destination weddings.'},
+      {name:'Book caterer',cat:'Venue & Vendors',days:230,tip:'Schedule a tasting before committing.'},
+      {name:'Choose dress / attire',cat:'Attire & Beauty',days:220,tip:'Allow 4-6 months for ordering and alterations.'},
+      {name:'Order invitations',cat:'Guest Management',days:180,tip:'Include RSVP cards and clear directions.'},
+      {name:'Book florist',cat:'Venue & Vendors',days:170,tip:'Share your color palette and vision.'},
+      {name:'Plan honeymoon',cat:'Legal & Admin',days:160,tip:'Book flights and accommodation early for best rates.'},
+      {name:'Schedule hair & makeup trial',cat:'Attire & Beauty',days:120,tip:'Take photos to see how the look photographs.'},
+      {name:'Send invitations',cat:'Guest Management',days:90,tip:'Send 6-8 weeks before the wedding.'},
+      {name:'Final dress fitting',cat:'Attire & Beauty',days:60,tip:'Schedule 2-3 weeks before for last adjustments.'},
+      {name:'Create seating chart',cat:'Guest Management',days:45,tip:'Wait until most RSVPs are in.'},
+      {name:'Get marriage license',cat:'Legal & Admin',days:30,tip:'Check local requirements — some have waiting periods.'},
+      {name:'Final vendor confirmations',cat:'Venue & Vendors',days:14,tip:'Confirm times, locations, and details with every vendor.'},
+      {name:'Rehearsal dinner planning',cat:'Day-of Logistics',days:10,tip:'Keep it relaxed — save energy for the big day.'},
+      {name:'Delegate day-of tasks',cat:'Day-of Logistics',days:7,tip:'Assign someone to handle vendor coordination.'},
+      {name:'Pack for honeymoon',cat:'Day-of Logistics',days:3,tip:'Use a packing list so you don\'t forget anything.'},
+      {name:'Enjoy your wedding day!',cat:'Day-of Logistics',days:0,tip:'Breathe, smile, and soak it all in.'}
+    ]
+  },
+  { id:'moving', icon:'&#x1F4E6;', name:'Moving', cls:'moving', desc:'8-week plan', categories:['Planning & Admin','Packing','Utilities & Services','Moving Day','Post-Move'],
+    tasks:[
+      {name:'Get moving quotes from 3+ companies',cat:'Planning & Admin',days:56,tip:'Compare prices, insurance, and reviews.'},
+      {name:'Create home inventory',cat:'Planning & Admin',days:54,tip:'Document valuables for insurance purposes.'},
+      {name:'Start decluttering room by room',cat:'Packing',days:50,tip:'Donate, sell, or toss what you don\'t need.'},
+      {name:'Book moving company',cat:'Planning & Admin',days:42,tip:'Weekend dates fill up fast — book early!'},
+      {name:'Give notice on current place',cat:'Planning & Admin',days:40,tip:'Check your lease for required notice period.'},
+      {name:'Order packing supplies',cat:'Packing',days:38,tip:'Boxes, tape, bubble wrap, markers, and labels.'},
+      {name:'Start packing non-essentials',cat:'Packing',days:28,tip:'Books, decorations, seasonal items first.'},
+      {name:'Notify address changes',cat:'Utilities & Services',days:25,tip:'Post office, bank, subscriptions, employer.'},
+      {name:'Transfer utilities',cat:'Utilities & Services',days:21,tip:'Set end date at old place, start date at new.'},
+      {name:'Pack remaining items',cat:'Packing',days:14,tip:'Label every box with room and contents.'},
+      {name:'Confirm moving company details',cat:'Planning & Admin',days:10,tip:'Time, address, special instructions.'},
+      {name:'Clean current place',cat:'Planning & Admin',days:7,tip:'Deep clean or hire cleaners for deposit return.'},
+      {name:'Pack essentials box',cat:'Packing',days:3,tip:'Toiletries, chargers, snacks, change of clothes.'},
+      {name:'Defrost freezer',cat:'Planning & Admin',days:2,tip:'Unplug 24 hours before moving.'},
+      {name:'Final walkthrough of old place',cat:'Moving Day',days:1,tip:'Check all rooms, closets, and storage areas.'},
+      {name:'Supervise movers & hand over keys',cat:'Moving Day',days:0,tip:'Take meter readings and photos.'},
+      {name:'Unpack essentials first',cat:'Post-Move',days:-1,tip:'Kitchen, bathroom, bedding — get comfortable fast.'},
+      {name:'Explore new neighborhood',cat:'Post-Move',days:-3,tip:'Find grocery stores, pharmacies, and restaurants.'}
+    ]
+  },
+  { id:'marathon', icon:'&#x1F3C3;', name:'Marathon', cls:'marathon', desc:'16-week plan', categories:['Training','Nutrition','Gear','Race Prep','Recovery'],
+    tasks:[
+      {name:'Get a physical checkup',cat:'Training',days:112,tip:'Make sure you\'re cleared for intense training.'},
+      {name:'Buy proper running shoes',cat:'Gear',days:110,tip:'Visit a running store for gait analysis.'},
+      {name:'Start base building (3-4 runs/week)',cat:'Training',days:105,tip:'Build your weekly mileage slowly.'},
+      {name:'Plan nutrition strategy',cat:'Nutrition',days:100,tip:'Experiment with gels, chews, and hydration.'},
+      {name:'Register for the marathon',cat:'Race Prep',days:90,tip:'Some races sell out quickly!'},
+      {name:'Increase long run to 10 miles',cat:'Training',days:80,tip:'Add 1-2 miles per week to your long run.'},
+      {name:'Buy race-day outfit',cat:'Gear',days:70,tip:'Nothing new on race day — test everything first.'},
+      {name:'Increase long run to 16 miles',cat:'Training',days:50,tip:'Slow and steady — these runs build endurance.'},
+      {name:'Practice race-day nutrition',cat:'Nutrition',days:45,tip:'Know what the race provides at aid stations.'},
+      {name:'Peak training: 20-mile long run',cat:'Training',days:30,tip:'This is your longest run — trust the training.'},
+      {name:'Start tapering (reduce mileage)',cat:'Training',days:21,tip:'Your body needs rest to perform on race day.'},
+      {name:'Prepare race day logistics',cat:'Race Prep',days:14,tip:'Travel, accommodation, bag check, start time.'},
+      {name:'Carb-load 3 days before',cat:'Nutrition',days:3,tip:'Increase carbs, reduce fiber and fat.'},
+      {name:'Lay out race outfit & gear',cat:'Race Prep',days:1,tip:'Pin your bib, charge your watch, set alarms.'},
+      {name:'Run the marathon!',cat:'Race Prep',days:0,tip:'Start slow, enjoy the crowd, finish strong!'},
+      {name:'Rest and recover',cat:'Recovery',days:-1,tip:'Light walking, stretching, and celebrate!'}
+    ]
+  },
+  { id:'baby', icon:'&#x1F476;', name:'New Baby', cls:'baby', desc:'9-month plan', categories:['Medical','Nursery','Shopping','Planning','Prep'],
+    tasks:[
+      {name:'Schedule first prenatal appointment',cat:'Medical',days:270,tip:'Usually around 8 weeks.'},
+      {name:'Start prenatal vitamins',cat:'Medical',days:265,tip:'Folic acid is especially important early on.'},
+      {name:'Research hospital / birth center',cat:'Medical',days:220,tip:'Tour facilities and ask about policies.'},
+      {name:'Share the news with family',cat:'Planning',days:200,tip:'Many wait until after the first trimester.'},
+      {name:'Start planning nursery',cat:'Nursery',days:180,tip:'Choose a theme and start collecting ideas.'},
+      {name:'Create baby registry',cat:'Shopping',days:160,tip:'Research must-haves vs nice-to-haves.'},
+      {name:'Sign up for birthing class',cat:'Medical',days:150,tip:'Classes fill up — register early.'},
+      {name:'Buy crib and nursery furniture',cat:'Nursery',days:140,tip:'Allow time for delivery and assembly.'},
+      {name:'Plan baby shower',cat:'Planning',days:120,tip:'Usually held 4-6 weeks before the due date.'},
+      {name:'Choose pediatrician',cat:'Medical',days:90,tip:'Interview 2-3 doctors to find the right fit.'},
+      {name:'Pack hospital bag',cat:'Prep',days:45,tip:'Include essentials for you, partner, and baby.'},
+      {name:'Install car seat',cat:'Prep',days:30,tip:'Get it inspected at a local fire station.'},
+      {name:'Prep meals for after birth',cat:'Prep',days:21,tip:'Freeze easy meals — you\'ll be glad you did.'},
+      {name:'Finish nursery setup',cat:'Nursery',days:14,tip:'Wash baby clothes, set up changing station.'},
+      {name:'Final hospital bag check',cat:'Prep',days:7,tip:'Double-check documents, snacks, and comfort items.'},
+      {name:'Welcome baby!',cat:'Prep',days:0,tip:'You\'ve prepared well. Trust yourself.'}
+    ]
+  },
+  { id:'job', icon:'&#x1F4BC;', name:'New Job', cls:'job', desc:'4-week plan', categories:['Preparation','First Week','Learning','Networking','Goals'],
+    tasks:[
+      {name:'Research company culture and values',cat:'Preparation',days:28,tip:'Read the website, blog, and Glassdoor reviews.'},
+      {name:'Set up work accounts / equipment',cat:'Preparation',days:21,tip:'Email, Slack, laptop — get it all ready.'},
+      {name:'Plan commute or remote setup',cat:'Preparation',days:14,tip:'Do a test run to avoid surprises.'},
+      {name:'Prepare first-day outfit',cat:'Preparation',days:7,tip:'Dress slightly above the company norm.'},
+      {name:'Introduce yourself to the team',cat:'First Week',days:0,tip:'Be friendly, ask questions, and listen.'},
+      {name:'Meet your manager 1:1',cat:'First Week',days:-1,tip:'Ask about expectations and priorities.'},
+      {name:'Set up 1:1s with key colleagues',cat:'Networking',days:-3,tip:'15-min coffee chats go a long way.'},
+      {name:'Complete onboarding training',cat:'Learning',days:-5,tip:'Take notes and ask questions.'},
+      {name:'Learn core tools and systems',cat:'Learning',days:-7,tip:'Don\'t rush — understanding takes time.'},
+      {name:'Draft 30-day goals with manager',cat:'Goals',days:-10,tip:'Align on quick wins and learning goals.'},
+      {name:'Ask for feedback after 2 weeks',cat:'Goals',days:-14,tip:'Show you\'re open to learning.'},
+      {name:'Review and adjust 90-day plan',cat:'Goals',days:-21,tip:'Update goals based on what you\'ve learned.'}
+    ]
+  }
+];
+
+/* ── App State ──────────────────────────────────── */
+let state = {
+  projects: [],
+  currentScreen: 'home',
+  selectedTemplate: null,
+  viewingProject: null
+};
+
+// Load saved state
+try { const s = localStorage.getItem('tt_state'); if(s) state = JSON.parse(s); } catch(e){}
+
+function save(){ localStorage.setItem('tt_state', JSON.stringify(state)); }
+
+/* ── Helpers ────────────────────────────────────── */
+function daysUntil(dateStr){
+  const d = new Date(dateStr); const now = new Date(); now.setHours(0,0,0,0); d.setHours(0,0,0,0);
+  return Math.round((d - now)/(1000*60*60*24));
+}
+function fmtDate(dateStr){
+  return new Date(dateStr).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function dueBadge(days){
+  if(days < 0) return '<span class="due-badge urgent">Overdue</span>';
+  if(days === 0) return '<span class="due-badge urgent">Today</span>';
+  if(days === 1) return '<span class="due-badge urgent">Tomorrow</span>';
+  if(days <= 7) return `<span class="due-badge soon">${days} days</span>`;
+  return `<span class="due-badge ok">${days} days</span>`;
+}
+function taskDueBadge(days, done){
+  if(done) return '<span class="task-due done-lbl">Done</span>';
+  if(days < 0) return '<span class="task-due urgent">Overdue</span>';
+  if(days === 0) return '<span class="task-due urgent">Today</span>';
+  if(days <= 2) return `<span class="task-due urgent">${days}d</span>`;
+  if(days <= 7) return `<span class="task-due warning">${days}d</span>`;
+  return `<span class="task-due normal">${days}d</span>`;
+}
+function progressColor(id){
+  const m = {wedding:'#ec4899',moving:'#3b82f6',marathon:'#10b981',baby:'#f59e0b',job:'#7c3aed'};
+  return m[id] || '#4f46e5';
+}
+
+/* ── Onboarding ─────────────────────────────────── */
+function goOnboard(step){
+  document.querySelectorAll('.onboard').forEach(el=>el.classList.remove('active'));
+  document.getElementById('onboard-'+step).classList.add('active');
+}
+function finishOnboard(){
+  document.querySelectorAll('.onboard').forEach(el=>el.classList.remove('active'));
+  // If no projects, seed demo data
+  if(!state.projects.length) seedDemoData();
+  navigate('home');
+}
+
+/* ── Seed Demo Data ─────────────────────────────── */
+function seedDemoData(){
+  const wedding = createProjectFromTemplate('wedding','Our Wedding','2026-06-15');
+  // Complete some tasks
+  wedding.tasks.forEach((t,i)=>{if(i < 14) {t.done=true; t.completedAt=new Date().toISOString();}});
+  const moving = createProjectFromTemplate('moving','Moving to New Apartment','2026-03-20');
+  moving.tasks.forEach((t,i)=>{if(i < 10) {t.done=true; t.completedAt=new Date().toISOString();}});
+  const marathon = createProjectFromTemplate('marathon','First Marathon','2026-09-12');
+  marathon.tasks.forEach((t,i)=>{if(i < 5) {t.done=true; t.completedAt=new Date().toISOString();}});
+  state.projects = [wedding, moving, marathon];
+  save();
+}
+
+function createProjectFromTemplate(tplId, name, targetDate){
+  const tpl = TEMPLATES.find(t=>t.id===tplId);
+  const tasks = tpl.tasks.map((t,i)=>{
+    const deadline = new Date(targetDate);
+    deadline.setDate(deadline.getDate() - t.days);
+    return { id: Date.now()+i+Math.random(), name:t.name, category:t.cat, deadline:deadline.toISOString().split('T')[0], tip:t.tip, done:false, completedAt:null };
+  });
+  return { id: Date.now()+Math.random(), tplId, name, targetDate, tasks, createdAt: new Date().toISOString() };
+}
+
+/* ── Navigation ─────────────────────────────────── */
+function navigate(screen, data){
+  state.currentScreen = screen;
+  if(data) state.viewingProject = data;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+screen).classList.add('active');
+
+  // Update tabs
+  document.querySelectorAll('.tab-item').forEach(t=>{
+    t.classList.toggle('active', t.dataset.tab===screen || (screen==='detail' && t.dataset.tab==='home'));
+  });
+
+  // Show/hide FAB
+  document.getElementById('fab').style.display = (screen==='detail'||screen==='profile')?'none':'flex';
+
+  // Render
+  if(screen==='home') renderHome();
+  else if(screen==='browse') renderBrowse();
+  else if(screen==='detail') renderDetail();
+  else if(screen==='profile') renderProfile();
+  save();
+}
+
+/* ── Render: Home ───────────────────────────────── */
+function renderHome(){
+  const projs = state.projects;
+  const totalTasks = projs.reduce((s,p)=>s+p.tasks.length,0);
+  const doneTasks = projs.reduce((s,p)=>s+p.tasks.filter(t=>t.done).length,0);
+  const pct = totalTasks ? Math.round(doneTasks/totalTasks*100) : 0;
+
+  document.getElementById('home-overview').innerHTML = `
+    <div class="overview-card hl"><div class="num">${projs.length}</div><div class="lbl">Active</div></div>
+    <div class="overview-card"><div class="num">${totalTasks-doneTasks}</div><div class="lbl">Tasks left</div></div>
+    <div class="overview-card"><div class="num">${pct}%</div><div class="lbl">Overall</div></div>
+  `;
+
+  if(!projs.length){
+    document.getElementById('home-projects').innerHTML = `
+      <div class="empty-state">
+        <div class="big-icon">&#x1F680;</div>
+        <h3>No projects yet</h3>
+        <p>Tap the + button or browse templates to start planning your first life event.</p>
+        <button class="btn-primary" onclick="navigate('browse')" style="max-width:200px;margin:0 auto">Browse Templates</button>
+      </div>`;
+    document.getElementById('home-tasks').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('home-projects').innerHTML = projs.map(p=>{
+    const tpl = TEMPLATES.find(t=>t.id===p.tplId);
+    const done = p.tasks.filter(t=>t.done).length;
+    const total = p.tasks.length;
+    const pct = Math.round(done/total*100);
+    const days = daysUntil(p.targetDate);
+    const color = progressColor(p.tplId);
+    return `<div class="project-card" onclick="navigate('detail','${p.id}')">
+      <div class="proj-top">
+        <div class="proj-icon ${tpl.cls}">${tpl.icon}</div>
+        <div class="proj-info"><h3>${p.name}</h3><div class="proj-meta"><span>${fmtDate(p.targetDate)}</span><span>&middot;</span><span>${done} of ${total} tasks</span></div></div>
+        ${dueBadge(days)}
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%;background:${color}"></div></div>
+      <div class="progress-text"><span>${done} / ${total} completed</span><span class="progress-pct" style="color:${color}">${pct}%</span></div>
+    </div>`;
+  }).join('');
+
+  // Upcoming tasks: get undone tasks sorted by deadline
+  const upcoming = projs.flatMap(p=>p.tasks.filter(t=>!t.done).map(t=>({...t,projName:p.name,projId:p.id,tplId:p.tplId})))
+    .sort((a,b)=>new Date(a.deadline)-new Date(b.deadline)).slice(0,5);
+  document.getElementById('home-tasks').innerHTML = upcoming.map(t=>{
+    const days = daysUntil(t.deadline);
+    return `<div class="task-item" onclick="navigate('detail','${t.projId}')">
+      <div class="task-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="task-body"><div class="task-name">${t.name}</div><div class="task-sub">${t.projName}</div></div>
+      ${taskDueBadge(days, false)}
+    </div>`;
+  }).join('');
+}
+
+/* ── Render: Browse Templates ───────────────────── */
+function renderBrowse(){
+  document.getElementById('tpl-grid').innerHTML = TEMPLATES.map(t=>`
+    <div class="tpl-card" onclick="openCreateModalWith('${t.id}')">
+      <div class="icon">${t.icon}</div>
+      <h3>${t.name}</h3>
+      <p>${t.desc}</p>
+      <div class="task-count">${t.tasks.length} tasks</div>
+    </div>
+  `).join('');
+}
+
+/* ── Render: Project Detail ─────────────────────── */
+function renderDetail(){
+  const proj = state.projects.find(p=>String(p.id)===String(state.viewingProject));
+  if(!proj){navigate('home');return;}
+  const tpl = TEMPLATES.find(t=>t.id===proj.tplId);
+  const done = proj.tasks.filter(t=>t.done).length;
+  const total = proj.tasks.length;
+  const pct = Math.round(done/total*100);
+  const days = daysUntil(proj.targetDate);
+  const color = progressColor(proj.tplId);
+  const overdue = proj.tasks.filter(t=>!t.done && daysUntil(t.deadline)<0).length;
+
+  document.getElementById('detail-hero').innerHTML = `
+    <div class="proj-top">
+      <div class="proj-icon ${tpl.cls}">${tpl.icon}</div>
+      <div class="proj-info"><h2>${proj.name}</h2><div class="meta-row"><span>${fmtDate(proj.targetDate)}</span>${dueBadge(days)}</div></div>
+    </div>
+    <div class="progress-wrap" style="height:8px"><div class="progress-bar" style="width:${pct}%;background:${color}"></div></div>
+    <div class="detail-stats">
+      <div class="detail-stat"><div class="num" style="color:${color}">${pct}%</div><div class="lbl">Complete</div></div>
+      <div class="detail-stat"><div class="num">${total-done}</div><div class="lbl">Remaining</div></div>
+      <div class="detail-stat"><div class="num" style="color:${overdue?'#ef4444':'var(--g900)'}">${overdue}</div><div class="lbl">Overdue</div></div>
+    </div>
+  `;
+
+  // Category tabs
+  const cats = ['All', ...tpl.categories];
+  document.getElementById('detail-cats').innerHTML = cats.map((c,i)=>
+    `<div class="cat-tab${i===0?' active':''}" onclick="filterDetailCat(this,'${c}')">${c}</div>`
+  ).join('');
+
+  renderDetailTasks(proj, 'All');
+}
+
+function filterDetailCat(el, cat){
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const proj = state.projects.find(p=>String(p.id)===String(state.viewingProject));
+  renderDetailTasks(proj, cat);
+}
+
+function renderDetailTasks(proj, cat){
+  const tasks = cat==='All' ? proj.tasks : proj.tasks.filter(t=>t.category===cat);
+  const undone = tasks.filter(t=>!t.done).sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
+  const completed = tasks.filter(t=>t.done);
+  let html = '';
+
+  if(undone.length){
+    html += `<div class="task-section-label">To Do (${undone.length})</div><div class="task-list">`;
+    html += undone.map(t=>{
+      const days = daysUntil(t.deadline);
+      return `<div class="task-item" onclick="toggleTask('${proj.id}','${t.id}')">
+        <div class="task-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="task-body"><div class="task-name">${t.name}</div><div class="task-sub">${t.category} &middot; ${fmtDate(t.deadline)}${t.tip ? ' &middot; <span style=\"color:var(--accent)\">Tip</span>' : ''}</div></div>
+        ${taskDueBadge(days, false)}
+      </div>`;
+    }).join('');
+    html += '</div>';
+  }
+
+  if(completed.length){
+    html += `<div class="task-section-label">Completed (${completed.length})</div><div class="task-list">`;
+    html += completed.map(t=>`
+      <div class="task-item" onclick="toggleTask('${proj.id}','${t.id}')" style="opacity:.6">
+        <div class="task-cb done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="task-body"><div class="task-name struck">${t.name}</div><div class="task-sub">${t.category}</div></div>
+        <span class="task-due done-lbl">Done</span>
+      </div>
+    `).join('');
+    html += '</div>';
+  }
+
+  // Contextual tip for first undone task
+  if(undone.length && undone[0].tip){
+    html = `<div class="tip-callout"><span class="tip-icon">&#x1F4A1;</span><p><strong>Tip:</strong> ${undone[0].tip}</p></div>` + html;
+  }
+
+  document.getElementById('detail-task-sections').innerHTML = html;
+}
+
+/* ── Toggle Task ────────────────────────────────── */
+function toggleTask(projId, taskId){
+  const proj = state.projects.find(p=>String(p.id)===String(projId));
+  if(!proj) return;
+  const task = proj.tasks.find(t=>String(t.id)===String(taskId));
+  if(!task) return;
+  task.done = !task.done;
+  task.completedAt = task.done ? new Date().toISOString() : null;
+  save();
+
+  if(task.done) showCelebration();
+  renderDetail();
+}
+
+/* ── Celebration ────────────────────────────────── */
+function showCelebration(){
+  const el = document.getElementById('celebration');
+  el.classList.add('show');
+  spawnConfetti();
+  setTimeout(()=>el.classList.remove('show'), 800);
+}
+
+function spawnConfetti(){
+  const colors = ['#4f46e5','#ec4899','#f59e0b','#10b981','#3b82f6','#7c3aed','#ef4444'];
+  for(let i=0;i<20;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti-piece';
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.left = (30+Math.random()*40)+'%';
+    c.style.top = '40%';
+    c.style.borderRadius = Math.random()>.5?'50%':'2px';
+    c.style.width = (6+Math.random()*6)+'px';
+    c.style.height = (6+Math.random()*6)+'px';
+    document.body.appendChild(c);
+    const dx = (Math.random()-.5)*200;
+    const dy = -(100+Math.random()*200);
+    const rot = Math.random()*720;
+    c.animate([
+      {transform:'translate(0,0) rotate(0deg)',opacity:1},
+      {transform:`translate(${dx}px,${dy+300}px) rotate(${rot}deg)`,opacity:0}
+    ],{duration:800+Math.random()*400,easing:'cubic-bezier(.25,.46,.45,.94)'});
+    setTimeout(()=>c.remove(),1200);
+  }
+}
+
+/* ── Render: Profile ────────────────────────────── */
+function renderProfile(){
+  const projs = state.projects;
+  const totalDone = projs.reduce((s,p)=>s+p.tasks.filter(t=>t.done).length,0);
+  const totalTasks = projs.reduce((s,p)=>s+p.tasks.length,0);
+  document.getElementById('profile-stats').innerHTML = `
+    <div class="overview-card"><div class="num">${projs.length}</div><div class="lbl">Projects</div></div>
+    <div class="overview-card hl"><div class="num">${totalDone}</div><div class="lbl">Tasks Done</div></div>
+    <div class="overview-card"><div class="num">${totalTasks ? Math.round(totalDone/totalTasks*100) : 0}%</div><div class="lbl">Complete</div></div>
+  `;
+}
+
+/* ── Create Project Modal ───────────────────────── */
+function openCreateModal(){
+  state.selectedTemplate = null;
+  document.getElementById('proj-name').value = '';
+  document.getElementById('proj-date').value = '';
+  renderModalTemplates();
+  document.getElementById('create-modal').classList.add('open');
+}
+function openCreateModalWith(tplId){
+  state.selectedTemplate = tplId;
+  const tpl = TEMPLATES.find(t=>t.id===tplId);
+  document.getElementById('proj-name').value = tpl.name;
+  document.getElementById('proj-date').value = '';
+  renderModalTemplates();
+  document.getElementById('create-modal').classList.add('open');
+}
+function closeCreateModal(e){
+  if(e && e.target !== e.currentTarget) return;
+  document.getElementById('create-modal').classList.remove('open');
+}
+function renderModalTemplates(){
+  document.getElementById('modal-tpl-grid').innerHTML = TEMPLATES.map(t=>
+    `<div class="tpl-opt${state.selectedTemplate===t.id?' selected':''}" onclick="selectTemplate('${t.id}')">
+      <div class="icon">${t.icon}</div>
+      <div class="name">${t.name}</div>
+    </div>`
+  ).join('');
+}
+function selectTemplate(id){
+  state.selectedTemplate = id;
+  const tpl = TEMPLATES.find(t=>t.id===id);
+  if(!document.getElementById('proj-name').value) document.getElementById('proj-name').value = tpl.name;
+  renderModalTemplates();
+}
+
+function createProject(){
+  if(!state.selectedTemplate){alert('Please select a template');return;}
+  const name = document.getElementById('proj-name').value.trim();
+  const date = document.getElementById('proj-date').value;
+  if(!name){alert('Please enter a project name');return;}
+  if(!date){alert('Please set a target date');return;}
+
+  const proj = createProjectFromTemplate(state.selectedTemplate, name, date);
+  state.projects.push(proj);
+  save();
+  closeCreateModal();
+  navigate('detail', proj.id);
+}
+
+/* ── Init ───────────────────────────────────────── */
+(function init(){
+  // Check if user has seen onboarding
+  const seen = localStorage.getItem('tt_onboarded');
+  if(seen && state.projects.length){
+    document.querySelectorAll('.onboard').forEach(el=>el.classList.remove('active'));
+    navigate('home');
+  } else if(seen && !state.projects.length){
+    document.querySelectorAll('.onboard').forEach(el=>el.classList.remove('active'));
+    seedDemoData();
+    navigate('home');
+  }
+  // Set default date for create modal
+  const d = new Date(); d.setMonth(d.getMonth()+6);
+  document.getElementById('proj-date').valueAsDate = d;
+})();
+
+function finishOnboard(){
+  localStorage.setItem('tt_onboarded','1');
+  document.querySelectorAll('.onboard').forEach(el=>el.classList.remove('active'));
+  if(!state.projects.length) seedDemoData();
+  navigate('home');
+}
+</script>
 
 </body>
 </html>
