@@ -190,6 +190,26 @@
     .empty-state h3{font-size:16px;font-weight:700;color:var(--g800);margin-bottom:4px}
     .empty-state p{font-size:13px;color:var(--g500);margin-bottom:16px}
 
+    /* ── Login Screen ─────────────────────────────── */
+    .login-screen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+    .login-screen.active{display:flex}
+    .login-screen .big-icon{font-size:64px;margin-bottom:16px}
+    .login-screen h1{font-size:28px;font-weight:800;color:var(--g900);margin-bottom:6px}
+    .login-screen .tagline{font-size:15px;color:var(--g500);margin-bottom:32px;max-width:280px}
+    .login-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:320px;padding:14px 20px;border-radius:var(--r);font-size:15px;font-weight:600;transition:.15s;margin-bottom:10px}
+    .login-btn.google{background:#fff;border:1px solid var(--g200);color:var(--g800)}
+    .login-btn.google:hover{background:var(--g50);box-shadow:var(--shadow-md)}
+    .login-btn.google img{width:20px;height:20px}
+    .login-btn.anon{background:var(--g100);color:var(--g600)}
+    .login-btn.anon:hover{background:var(--g200)}
+    .login-loading{display:none;flex-direction:column;align-items:center;gap:12px;padding:20px}
+    .login-loading.show{display:flex}
+    .spinner{width:32px;height:32px;border:3px solid var(--g200);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .login-divider{display:flex;align-items:center;gap:12px;width:100%;max-width:320px;margin:6px 0 16px;color:var(--g400);font-size:12px}
+    .login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--g200)}
+    .signout-btn{color:var(--red);font-weight:600;font-size:14px;padding:12px 0;cursor:pointer;display:flex;align-items:center;gap:8px;justify-content:center;margin-top:8px}
+
     /* ── Confetti ──────────────────────────────────── */
     .confetti-piece{position:fixed;width:8px;height:8px;border-radius:2px;z-index:400;pointer-events:none}
   </style>
@@ -200,6 +220,25 @@
 <!--  ONBOARDING                                     -->
 <!-- ════════════════════════════════════════════════ -->
 <div class="app" id="app">
+
+  <!-- Login Screen -->
+  <div class="login-screen active" id="login-screen">
+    <div class="big-icon">&#x1F3AF;</div>
+    <h1>TimelineTasks</h1>
+    <p class="tagline">Plan life's big moments with smart, deadline-driven checklists.</p>
+    <div id="login-buttons">
+      <button class="login-btn google" onclick="signInWithGoogle()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G" />
+        Sign in with Google
+      </button>
+      <div class="login-divider">or</div>
+      <button class="login-btn anon" onclick="signInAnonymously()">Continue without account</button>
+    </div>
+    <div class="login-loading" id="login-loading">
+      <div class="spinner"></div>
+      <span style="font-size:13px;color:var(--g500)">Signing in...</span>
+    </div>
+  </div>
 
   <!-- Onboarding Step 1: Welcome -->
   <div class="onboard active" id="onboard-1">
@@ -350,6 +389,10 @@
         <span class="arrow">&#x203A;</span>
       </div>
     </div>
+    <div class="signout-btn" onclick="doSignOut()">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
+    </div>
   </div>
 
   <!-- FAB -->
@@ -406,9 +449,30 @@
 <div class="celebration" id="celebration"><div class="emoji">&#x1F389;</div></div>
 
 <!-- ════════════════════════════════════════════════ -->
+<!--  FIREBASE SDK                                    -->
+<!-- ════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<!-- ════════════════════════════════════════════════ -->
 <!--  JAVASCRIPT                                     -->
 <!-- ════════════════════════════════════════════════ -->
 <script>
+/* ── Firebase Init ─────────────────────────────── */
+const firebaseConfig = {
+  apiKey: "AIzaSyAYG_eeovX9fNAAd4paF8ytrw_oemqkAwc",
+  authDomain: "timelinetasks-3c8e4.firebaseapp.com",
+  projectId: "timelinetasks-3c8e4",
+  storageBucket: "timelinetasks-3c8e4.firebasestorage.app",
+  messagingSenderId: "918200090141",
+  appId: "1:918200090141:web:f2b8f8cab6c7ba119090f4"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+let currentUser = null;
+let unsubFirestore = null;
 /* ── Template Data ─────────────────────────────── */
 const TEMPLATES = [
   { id:'wedding', icon:'&#x1F492;', name:'Wedding', cls:'wedding', desc:'12-month plan', categories:['Venue & Vendors','Guest Management','Attire & Beauty','Legal & Admin','Day-of Logistics'],
@@ -525,10 +589,41 @@ let state = {
   viewingProject: null
 };
 
-// Load saved state
-try { const s = localStorage.getItem('tt_state'); if(s) state = JSON.parse(s); } catch(e){}
+function save(){
+  if(!currentUser) return;
+  // Save each project as a Firestore doc
+  const userDoc = db.collection('users').doc(currentUser.uid);
+  userDoc.set({ displayName: currentUser.displayName || 'User', email: currentUser.email || '', updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, {merge:true});
+  const batch = db.batch();
+  // We store all projects as a single doc for simplicity (avoids sub-collection complexity for a small app)
+  userDoc.collection('data').doc('state').set({
+    projects: JSON.parse(JSON.stringify(state.projects))
+  });
+}
 
-function save(){ localStorage.setItem('tt_state', JSON.stringify(state)); }
+function loadStateFromFirestore(){
+  if(!currentUser) return Promise.resolve();
+  return db.collection('users').doc(currentUser.uid).collection('data').doc('state').get().then(doc => {
+    if(doc.exists && doc.data().projects){
+      state.projects = doc.data().projects;
+    }
+  });
+}
+
+function listenToFirestore(){
+  if(unsubFirestore) unsubFirestore();
+  if(!currentUser) return;
+  unsubFirestore = db.collection('users').doc(currentUser.uid).collection('data').doc('state')
+    .onSnapshot(doc => {
+      if(doc.exists && doc.data().projects){
+        state.projects = doc.data().projects;
+        // Re-render current screen
+        if(state.currentScreen === 'home') renderHome();
+        else if(state.currentScreen === 'detail') renderDetail();
+        else if(state.currentScreen === 'profile') renderProfile();
+      }
+    });
+}
 
 /* ── Helpers ────────────────────────────────────── */
 function daysUntil(dateStr){
@@ -870,22 +965,89 @@ function createProject(){
   navigate('detail', proj.id);
 }
 
+/* ── Auth Functions ─────────────────────────────── */
+function signInWithGoogle(){
+  document.getElementById('login-buttons').style.display = 'none';
+  document.getElementById('login-loading').classList.add('show');
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(err => {
+    console.error('Google sign-in error:', err);
+    document.getElementById('login-buttons').style.display = '';
+    document.getElementById('login-loading').classList.remove('show');
+    if(err.code !== 'auth/popup-closed-by-user') alert('Sign-in failed: ' + err.message);
+  });
+}
+
+function signInAnonymously(){
+  document.getElementById('login-buttons').style.display = 'none';
+  document.getElementById('login-loading').classList.add('show');
+  auth.signInAnonymously().catch(err => {
+    console.error('Anonymous sign-in error:', err);
+    document.getElementById('login-buttons').style.display = '';
+    document.getElementById('login-loading').classList.remove('show');
+    alert('Sign-in failed: ' + err.message);
+  });
+}
+
+function doSignOut(){
+  if(unsubFirestore) unsubFirestore();
+  auth.signOut();
+}
+
+function showApp(user){
+  currentUser = user;
+  document.getElementById('login-screen').classList.remove('active');
+  loadStateFromFirestore().then(() => {
+    const seen = localStorage.getItem('tt_onboarded');
+    if(seen && state.projects.length){
+      document.querySelectorAll('.onboard').forEach(el=>el.classList.remove('active'));
+      navigate('home');
+    } else if(seen && !state.projects.length){
+      document.querySelectorAll('.onboard').forEach(el=>el.classList.remove('active'));
+      seedDemoData();
+      navigate('home');
+    }
+    // Update profile with real user info
+    updateProfileUI();
+    listenToFirestore();
+  });
+}
+
+function showLogin(){
+  currentUser = null;
+  state.projects = [];
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.onboard').forEach(el=>el.classList.remove('active'));
+  document.getElementById('login-screen').classList.add('active');
+  document.getElementById('login-buttons').style.display = '';
+  document.getElementById('login-loading').classList.remove('show');
+}
+
+function updateProfileUI(){
+  if(!currentUser) return;
+  const name = currentUser.displayName || (currentUser.isAnonymous ? 'Guest User' : 'User');
+  const email = currentUser.email || (currentUser.isAnonymous ? 'Anonymous account' : '');
+  const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || 'G';
+  document.querySelector('.profile-header h2').textContent = name;
+  document.querySelector('.profile-header p').textContent = email;
+  document.querySelector('.big-avatar').textContent = initials;
+  document.querySelector('.avatar').textContent = initials[0];
+  document.getElementById('home-greeting').textContent = 'Welcome back, ' + name.split(' ')[0];
+}
+
 /* ── Init ───────────────────────────────────────── */
-(function init(){
-  // Check if user has seen onboarding
-  const seen = localStorage.getItem('tt_onboarded');
-  if(seen && state.projects.length){
-    document.querySelectorAll('.onboard').forEach(el=>el.classList.remove('active'));
-    navigate('home');
-  } else if(seen && !state.projects.length){
-    document.querySelectorAll('.onboard').forEach(el=>el.classList.remove('active'));
-    seedDemoData();
-    navigate('home');
+// Set default date for create modal
+const _d = new Date(); _d.setMonth(_d.getMonth()+6);
+document.getElementById('proj-date').valueAsDate = _d;
+
+// Firebase Auth state listener — single entry point
+auth.onAuthStateChanged(user => {
+  if(user) {
+    showApp(user);
+  } else {
+    showLogin();
   }
-  // Set default date for create modal
-  const d = new Date(); d.setMonth(d.getMonth()+6);
-  document.getElementById('proj-date').valueAsDate = d;
-})();
+});
 
 function finishOnboard(){
   localStorage.setItem('tt_onboarded','1');

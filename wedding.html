@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TimelineTasks — Plan Your Wedding Without the Chaos</title>
+  <meta name="description" content="Turn your big day into a clear, beautiful timeline — so you always know what's next and nothing gets forgotten." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --coral: #FF6B6B;
+      --purple: #845EC2;
+      --peach: #FFF5F0;
+      --blush: #FEC5E5;
+      --sunshine: #FFD93D;
+      --mint: #6BCB77;
+      --charcoal: #2D3436;
+      --warm-grey: #636E72;
+      --cloud: #F8F9FA;
+      --mist: #E9ECEF;
+      --r: 20px;
+      --r-btn: 16px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--charcoal);
+      line-height: 1.6;
+      background: #fff;
+      overflow-x: hidden;
+    }
+
+    /* ── Top Bar ─────────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--mist);
+    }
+    .topbar .logo {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 20px; font-weight: 800; color: var(--charcoal);
+      text-decoration: none;
+    }
+    .topbar .logo span { font-size: 22px; }
+    .topbar .cta-sm {
+      padding: 10px 22px; border-radius: var(--r-btn); border: none;
+      background: linear-gradient(135deg, var(--coral), var(--purple));
+      color: #fff; font-weight: 700; font-size: 14px;
+      cursor: pointer; transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 4px 15px rgba(255,107,107,0.25);
+    }
+    .topbar .cta-sm:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(255,107,107,0.35); }
+
+    /* ── Hero ─────────────────────────────────── */
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 80px 24px 60px;
+      background: linear-gradient(180deg, #FFF5F0 0%, #fff 100%);
+      overflow: hidden;
+    }
+    .blob {
+      position: absolute; border-radius: 50% 40% 60% 30% / 40% 50% 30% 60%;
+      opacity: 0.15; pointer-events: none;
+    }
+    .blob-1 {
+      width: 300px; height: 300px; background: var(--blush);
+      top: -60px; right: -80px;
+      animation: float 8s ease-in-out infinite;
+    }
+    .blob-2 {
+      width: 200px; height: 200px; background: var(--coral);
+      bottom: -40px; left: -60px;
+      animation: float 10s ease-in-out infinite reverse;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0,0) rotate(0deg); }
+      33% { transform: translate(15px,-20px) rotate(5deg); }
+      66% { transform: translate(-10px,10px) rotate(-3deg); }
+    }
+
+    .hero h1 {
+      font-size: 40px; font-weight: 800; line-height: 1.15;
+      max-width: 600px; margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--coral), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .sub {
+      font-size: 18px; color: var(--warm-grey); max-width: 480px;
+      margin: 0 auto 32px; line-height: 1.6;
+    }
+
+    .cta-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 16px 36px; border-radius: var(--r-btn); border: none;
+      background: linear-gradient(135deg, var(--coral), var(--purple));
+      color: #fff; font-weight: 700; font-size: 17px; font-family: inherit;
+      cursor: pointer; transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+    }
+    .cta-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(255,107,107,0.4); }
+
+    .hero-emojis {
+      margin-top: 36px; font-size: 40px;
+      display: flex; justify-content: center; gap: 16px;
+    }
+    .hero-emojis span {
+      display: inline-block;
+      animation: bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .hero-emojis span:nth-child(2) { animation-delay: 0.1s; }
+    .hero-emojis span:nth-child(3) { animation-delay: 0.2s; }
+    .hero-emojis span:nth-child(4) { animation-delay: 0.3s; }
+    @keyframes bounceIn {
+      0% { transform: scale(0); opacity: 0; }
+      60% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* ── Carousel ─────────────────────────────── */
+    .carousel-section {
+      padding: 60px 24px;
+      text-align: center;
+      background: var(--cloud);
+    }
+    .carousel-section h2 {
+      font-size: 26px; font-weight: 800; margin-bottom: 8px;
+    }
+    .carousel-section .section-sub {
+      font-size: 15px; color: var(--warm-grey); margin-bottom: 32px;
+    }
+
+    .carousel-wrapper {
+      position: relative;
+      max-width: 380px; margin: 0 auto;
+      overflow: hidden; border-radius: var(--r);
+      touch-action: pan-y;
+    }
+    .carousel-track {
+      display: flex; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .carousel-slide {
+      min-width: 100%; padding: 0 8px;
+    }
+    .carousel-card {
+      background: #fff; border-radius: var(--r); padding: 32px 24px;
+      box-shadow: 0 4px 20px rgba(132,94,194,0.08);
+      text-align: center;
+    }
+    .carousel-card .card-emoji { font-size: 56px; margin-bottom: 16px; display: block; }
+    .carousel-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .carousel-card p { font-size: 14px; color: var(--warm-grey); line-height: 1.6; }
+
+    /* Mini timeline illustration */
+    .mini-timeline {
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      margin: 16px 0 8px;
+    }
+    .mini-timeline .node {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--mist); flex-shrink: 0;
+    }
+    .mini-timeline .node.done { background: var(--mint); }
+    .mini-timeline .node.active { background: var(--coral); box-shadow: 0 0 0 4px rgba(255,107,107,0.2); }
+    .mini-timeline .line {
+      width: 24px; height: 3px; border-radius: 2px; background: var(--mist);
+    }
+    .mini-timeline .line.done { background: var(--mint); }
+
+    /* Progress bar illustration */
+    .mini-progress {
+      background: var(--mist); height: 8px; border-radius: 4px;
+      margin: 16px 24px 8px; overflow: hidden;
+    }
+    .mini-progress .fill {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg, var(--coral), var(--purple));
+      transition: width 1s ease;
+    }
+
+    .carousel-dots {
+      display: flex; justify-content: center; gap: 8px; margin-top: 24px;
+    }
+    .carousel-dots .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--mist); border: none; cursor: pointer;
+      transition: all 0.3s ease; padding: 0;
+    }
+    .carousel-dots .dot.active {
+      width: 28px; border-radius: 5px;
+      background: linear-gradient(135deg, var(--coral), var(--purple));
+    }
+
+    /* ── Features ─────────────────────────────── */
+    .features {
+      padding: 60px 24px;
+      text-align: center;
+    }
+    .features h2 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+    .features .section-sub { font-size: 15px; color: var(--warm-grey); margin-bottom: 36px; }
+
+    .features-grid {
+      display: grid; grid-template-columns: 1fr;
+      gap: 20px; max-width: 900px; margin: 0 auto;
+    }
+    .feature-card {
+      background: var(--cloud); border-radius: var(--r);
+      padding: 28px 24px; text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(132,94,194,0.1);
+    }
+    .feature-card .feat-emoji { font-size: 40px; margin-bottom: 12px; display: block; }
+    .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .feature-card p { font-size: 14px; color: var(--warm-grey); line-height: 1.6; }
+
+    /* ── Social Proof ─────────────────────────── */
+    .social-proof {
+      padding: 48px 24px;
+      text-align: center;
+      background: linear-gradient(180deg, #fff 0%, var(--peach) 100%);
+    }
+    .quote {
+      font-size: 20px; font-weight: 600; font-style: italic;
+      max-width: 520px; margin: 0 auto 12px;
+      color: var(--charcoal); line-height: 1.5;
+    }
+    .quote-author {
+      font-size: 14px; color: var(--warm-grey); font-weight: 600;
+    }
+
+    /* ── CTA Section ──────────────────────────── */
+    .cta-section {
+      padding: 60px 24px;
+      text-align: center;
+      background: var(--peach);
+      position: relative; overflow: hidden;
+    }
+    .cta-section .blob-3 {
+      width: 250px; height: 250px; background: var(--blush);
+      top: -60px; left: -80px;
+    }
+    .cta-section h2 { font-size: 28px; font-weight: 800; margin-bottom: 8px; position: relative; }
+    .cta-section .section-sub { font-size: 15px; color: var(--warm-grey); margin-bottom: 28px; position: relative; }
+
+    .signup-form {
+      display: flex; flex-direction: column; gap: 10px;
+      max-width: 420px; margin: 0 auto; position: relative;
+    }
+    .signup-form input[type="email"] {
+      padding: 14px 18px; border: 2px solid var(--mist);
+      border-radius: 14px; font-size: 15px; font-family: inherit;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .signup-form input[type="email"]:focus {
+      outline: none; border-color: var(--purple);
+      box-shadow: 0 0 0 4px rgba(132,94,194,0.1);
+    }
+    .signup-form input[type="email"]::placeholder { color: #B2BEC3; }
+    .signup-note {
+      font-size: 12px; color: var(--warm-grey); margin-top: 4px;
+    }
+
+    /* ── Footer ───────────────────────────────── */
+    footer {
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 13px; color: var(--warm-grey);
+      background: #fff;
+      border-top: 1px solid var(--mist);
+    }
+    footer a { color: var(--purple); text-decoration: none; font-weight: 600; }
+
+    /* ── Responsive ───────────────────────────── */
+    @media (min-width: 640px) {
+      .hero h1 { font-size: 48px; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .signup-form { flex-direction: row; }
+      .signup-form input[type="email"] { flex: 1; }
+    }
+    @media (min-width: 1024px) {
+      .features-grid { grid-template-columns: 1fr 1fr 1fr; }
+      .hero { padding: 100px 24px 80px; }
+    }
+
+    /* ── Reduced Motion ───────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <nav class="topbar">
+    <a href="index.html" class="logo"><span>&#x1F3AF;</span> TimelineTasks</a>
+    <button class="cta-sm" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'})">Join Early Beta</button>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <h1>Plan Your Wedding Without the Chaos</h1>
+    <p class="sub">Turn your big day into a clear, beautiful timeline — so you always know what's next and nothing gets forgotten.</p>
+    <button class="cta-primary" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'})">
+      Join Early Beta &#x2728;
+    </button>
+    <div class="hero-emojis">
+      <span>&#x1F492;</span>
+      <span>&#x1F490;</span>
+      <span>&#x1F48D;</span>
+      <span>&#x2764;&#xFE0F;</span>
+    </div>
+  </section>
+
+  <!-- Carousel -->
+  <section class="carousel-section">
+    <h2>How It Works</h2>
+    <p class="section-sub">Your entire wedding plan — visual, calm, and under control.</p>
+
+    <div class="carousel-wrapper" id="carousel">
+      <div class="carousel-track" id="carousel-track">
+
+        <!-- Slide 1: Overview -->
+        <div class="carousel-slide">
+          <div class="carousel-card">
+            <span class="card-emoji">&#x1F4CB;</span>
+            <h3>Your Timeline at a Glance</h3>
+            <div class="mini-timeline">
+              <div class="node done"></div><div class="line done"></div>
+              <div class="node done"></div><div class="line done"></div>
+              <div class="node active"></div><div class="line"></div>
+              <div class="node"></div><div class="line"></div>
+              <div class="node"></div>
+            </div>
+            <p>See your entire wedding timeline at a glance. Every milestone, every deadline, one beautiful view.</p>
+          </div>
+        </div>
+
+        <!-- Slide 2: Milestones -->
+        <div class="carousel-slide">
+          <div class="carousel-card">
+            <span class="card-emoji">&#x1F3AF;</span>
+            <h3>Break It Into Milestones</h3>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0 8px">
+              <span style="background:#FEC5E5;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">&#x1F3E0; Venue</span>
+              <span style="background:#E8D5F5;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">&#x1F465; Guests</span>
+              <span style="background:#FFF5F0;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">&#x1F457; Dress</span>
+              <span style="background:#FFE8CC;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">&#x1F4B0; Budget</span>
+            </div>
+            <p>Venue, guests, dress, budget — each milestone becomes a manageable chunk.</p>
+          </div>
+        </div>
+
+        <!-- Slide 3: Tasks -->
+        <div class="carousel-slide">
+          <div class="carousel-card">
+            <span class="card-emoji">&#x2705;</span>
+            <h3>Track Tasks & Progress</h3>
+            <div style="text-align:left;margin:16px 0 8px">
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F1F1F1">
+                <div style="width:18px;height:18px;border-radius:5px;background:var(--mint);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">&#x2713;</div>
+                <span style="font-size:13px;text-decoration:line-through;color:#B2BEC3">Book venue</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F1F1F1">
+                <div style="width:18px;height:18px;border-radius:5px;background:var(--mint);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">&#x2713;</div>
+                <span style="font-size:13px;text-decoration:line-through;color:#B2BEC3">Hire photographer</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+                <div style="width:18px;height:18px;border-radius:5px;border:2px solid var(--mist)"></div>
+                <span style="font-size:13px;font-weight:600">Send save-the-dates</span>
+                <span style="margin-left:auto;font-size:11px;background:#FEF3C7;color:#92400e;padding:2px 8px;border-radius:999px;font-weight:600">5 days</span>
+              </div>
+            </div>
+            <p>Track tasks and progress clearly. Smart deadlines keep you on track.</p>
+          </div>
+        </div>
+
+        <!-- Slide 4: Progress -->
+        <div class="carousel-slide">
+          <div class="carousel-card">
+            <span class="card-emoji">&#x1F389;</span>
+            <h3>Stay Calm, Stay on Track</h3>
+            <div class="mini-progress"><div class="fill" style="width:68%"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--warm-grey);padding:0 24px;margin-bottom:12px">
+              <span>15 of 22 done</span>
+              <span style="font-weight:700;color:var(--coral)">68%</span>
+            </div>
+            <p>Feel calm knowing you're on track. Celebrate every milestone along the way.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="carousel-dots" id="carousel-dots">
+      <button class="dot active" data-slide="0" aria-label="Slide 1"></button>
+      <button class="dot" data-slide="1" aria-label="Slide 2"></button>
+      <button class="dot" data-slide="2" aria-label="Slide 3"></button>
+      <button class="dot" data-slide="3" aria-label="Slide 4"></button>
+    </div>
+  </section>
+
+  <!-- Social Proof -->
+  <section class="social-proof">
+    <p class="quote">"I wish I had this when I planned my wedding. The timeline view alone would have saved me weeks of stress."</p>
+    <p class="quote-author">— Early beta tester</p>
+  </section>
+
+  <!-- Features -->
+  <section class="features">
+    <h2>Why Couples Love It</h2>
+    <p class="section-sub">Built for real life, not project managers.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feat-emoji">&#x1F4C5;</span>
+        <h3>Auto-Calculated Deadlines</h3>
+        <p>Set your wedding date — we work backwards and set every deadline for you. No spreadsheets needed.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feat-emoji">&#x1F91D;</span>
+        <h3>Plan Together</h3>
+        <p>Invite your partner, family, or wedding planner. Everyone stays in sync, everyone sees progress.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feat-emoji">&#x1F4A1;</span>
+        <h3>Smart Tips at Every Step</h3>
+        <p>Contextual advice from wedding experts — right when you need it. "Book the florist? Here's what to ask."</p>
+      </div>
+      <div class="feature-card">
+        <span class="feat-emoji">&#x1F381;</span>
+        <h3>Expert Templates</h3>
+        <p>Start with a proven 22-task wedding checklist. Customize it to match your vision.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feat-emoji">&#x1F514;</span>
+        <h3>Gentle Reminders</h3>
+        <p>Never miss a deadline. Get friendly nudges before things get urgent.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feat-emoji">&#x1F389;</span>
+        <h3>Celebrate Milestones</h3>
+        <p>Every checked task is a small victory. Confetti, progress bars, and that satisfying feeling.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section" id="signup">
+    <div class="blob blob-3"></div>
+    <h2>Ready to Plan Stress-Free? &#x1F492;</h2>
+    <p class="section-sub">Join the early beta and be the first to try TimelineTasks.</p>
+    <form class="signup-form" action="https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse" method="POST" target="_blank" onsubmit="showThanks(event)">
+      <input type="email" name="entry.EMAIL_FIELD" placeholder="Your email address" required aria-label="Email address" />
+      <button type="submit" class="cta-primary">Join Early Beta</button>
+    </form>
+    <p class="signup-note">Early prototype — no spam, unsubscribe anytime.</p>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&#x1F3AF; TimelineTasks &mdash; Plan life's big moments.</p>
+    <p style="margin-top:6px"><a href="index.html">Back to app</a></p>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    /* ── Carousel ───────────────────────────────── */
+    const track = document.getElementById('carousel-track');
+    const dots = document.querySelectorAll('#carousel-dots .dot');
+    let current = 0;
+    const total = 4;
+    let autoTimer = null;
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    function goToSlide(i) {
+      current = ((i % total) + total) % total;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((d, idx) => d.classList.toggle('active', idx === current));
+    }
+
+    function nextSlide() { goToSlide(current + 1); }
+
+    function startAuto() {
+      stopAuto();
+      autoTimer = setInterval(nextSlide, 4000);
+    }
+
+    function stopAuto() {
+      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    }
+
+    // Dot clicks
+    dots.forEach(d => {
+      d.addEventListener('click', () => {
+        goToSlide(parseInt(d.dataset.slide));
+        startAuto();
+      });
+    });
+
+    // Touch / swipe
+    const wrapper = document.getElementById('carousel');
+    wrapper.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+      stopAuto();
+    }, { passive: true });
+    wrapper.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) nextSlide();
+        else goToSlide(current - 1);
+      }
+      startAuto();
+    }, { passive: true });
+
+    startAuto();
+
+    /* ── Signup Thanks ─────────────────────────── */
+    function showThanks(e) {
+      const form = e.target;
+      const btn = form.querySelector('button');
+      btn.textContent = 'Thanks! \u2764\uFE0F';
+      btn.style.background = 'var(--mint)';
+      btn.style.boxShadow = '0 4px 15px rgba(107,203,119,0.3)';
+    }
+  </script>
+
+</body>
+</html>
