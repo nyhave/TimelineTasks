@@ -648,6 +648,16 @@
 
 ---
 
+## 🔍 Tasks Missing to Be Done (Gap Check)
+
+- [ ] Define and document a concrete MVP "done" checklist (launch blockers vs. nice-to-haves)
+- [ ] Set up CI checks for basic quality gates (format/lint/test where applicable)
+- [ ] Create a minimal QA/UAT test script for critical user flows (signup, project creation, task completion, payments)
+- [ ] Publish legal pages before launch (Privacy Policy + Terms of Service links on landing/app)
+- [ ] Define post-launch support process (bug triage SLA, incident response owner, feedback loop)
+
+---
+
 ## 📞 Contact & Support
 
 **Project Owner:** [Your Name]
@@ -734,4 +744,3 @@
 ---
 
 **END OF DOCUMENT**
-
